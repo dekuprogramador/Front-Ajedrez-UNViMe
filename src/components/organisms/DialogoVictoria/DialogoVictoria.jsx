@@ -1,20 +1,13 @@
 import Boton from '../../atoms/Boton/index.js';
 import Dialogo from '../Dialogo/index.js';
 
-const colores = {
-  w: 'Blancas',
-  b: 'Negras',
-};
-
 const DialogoVictoria = ({ resultado, onRevisar, onMenu }) => (
   <Dialogo
     onCerrar={onRevisar}
-    titulo={`¡${resultado.ganador} (${colores[resultado.colorGanador]}) gana!`}
-    variante="victoria"
+    titulo={resultado.titulo}
+    variante={resultado.tipo === 'victoria' ? 'victoria' : 'rendicion'}
   >
-    <p className="dialogo-mensaje">
-      por abandono de {resultado.abandonante}
-    </p>
+    <p className="dialogo-mensaje">{resultado.mensaje}</p>
     <div className="dialogo-acciones">
       <Boton className="dialogo-boton" onClick={onRevisar}>
         Revisar partida
@@ -23,7 +16,7 @@ const DialogoVictoria = ({ resultado, onRevisar, onMenu }) => (
         Menú principal
       </Boton>
     </div>
-    <p className="dialogo-id">ID de partida: No disponible</p>
+    <p className="dialogo-id">ID de partida: {resultado.idPartida ?? 'No disponible'}</p>
   </Dialogo>
 );
 

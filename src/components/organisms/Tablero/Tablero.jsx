@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { piezasDesdeFen } from '../../../utils/traductores.js';
+
+const POSICION_INICIAL = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+
+const estiloSeleccion = { backgroundColor: 'var(--color-casilla-seleccionada)' };
+const estiloDestino = {
+  background: 'radial-gradient(circle, var(--color-destino-jugada) 22%, transparent 25%)',
+};
 
 const calcularAncho = () => Math.max(
   200,
@@ -10,10 +18,19 @@ const calcularAncho = () => Math.max(
   ),
 );
 
+const crearEstilosCasillas = (seleccionada, destinos) => {
+  const estilos = Object.fromEntries(destinos.map((casilla) => [casilla, estiloDestino]));
+  if (seleccionada) estilos[seleccionada] = estiloSeleccion;
+  return estilos;
+};
+
 const Tablero = ({
-  posicion = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
+  posicion = POSICION_INICIAL,
   color = 'w',
   clase = '',
+  seleccionada = null,
+  destinos = [],
+  onCasilla,
 }) => {
   const [ancho, setAncho] = useState(540);
 
@@ -26,18 +43,20 @@ const Tablero = ({
 
   return (
     <div
-      className={`tablero${color === 'b' ? ' tablero--girado' : ''} ${clase}`.trim()}
+      className={`tablero ${clase}`.trim()}
       role="img"
       aria-label="Tablero de ajedrez"
     >
       <Chessboard
         options={{
           allowDragging: false,
-          boardOrientation: 'white',
+          boardOrientation: color === 'b' ? 'black' : 'white',
           boardStyle: { width: ancho, height: ancho },
           darkSquareStyle: { backgroundColor: 'var(--color-casilla-oscura)' },
           lightSquareStyle: { backgroundColor: 'var(--color-casilla-clara)' },
-          position: posicion,
+          onSquareClick: onCasilla ? ({ square }) => onCasilla(square) : undefined,
+          position: piezasDesdeFen(posicion),
+          squareStyles: crearEstilosCasillas(seleccionada, destinos),
         }}
       />
     </div>

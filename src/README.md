@@ -6,7 +6,7 @@
 | Dato | Valor |
 |---|---|
 | URL local | `http://localhost:5173` |
-| Backend previsto | `http://127.0.0.1:3001` (variable `VITE_API_URL`; integración pendiente) |
+| Backend previsto | `http://127.0.0.1:3001` (variable `VITE_API_URL`, ver `.env.example`; integrado: crear partida, jugadas, turno de la máquina, rendirse y guardar y salir) |
 | Diseño | `05 · Diseño Gráfico & UX` (Perla Quispe) · tokens en `src/styles/tokens.css` |
 | Tablero | librería `react-chessboard` (especificación de UX) |
 | Valores de entorno y puesta en marcha | `docs/documento-GC.md` §3.3 y §6 |
@@ -23,7 +23,7 @@ src/
 ├── pages/
 │   └── PaginaAjedrez/ Estado del flujo actual y composición de las plantillas.
 ├── hooks/            Lógica reutilizable cuando la necesite más de una página.
-├── services/         Único lugar para llamadas HTTP (cuando se integre el backend).
+├── services/         Único lugar para llamadas HTTP: `clienteApi` (fetch + errores), `partidasApi` (un método por endpoint) y `normalizar` (único lugar que conoce los nombres de campo del backend).
 ├── utils/            Funciones puras independientes de React.
 ├── styles/           Tokens de diseño y estilos globales.
 └── assets/           Recursos estáticos.
@@ -72,7 +72,7 @@ desde `index.js`. Los estilos compartidos usan tokens de `src/styles/tokens.css`
 
 La columna "Origen" indica de qué documento sale cada pieza. El inventario también conserva
 componentes previstos que no forman parte de la interfaz de referencia actual; todavía no se
-implementan historial, guardado de partidas, jugadas legales ni conexión al backend.
+implementan historial, visor PGN, reanudar partidas ni reloj. Ya están conectados al backend: nueva partida, jugadas legales, turno de la máquina, rendición, coronación, error/timeout del motor y "Guardar y salir".
 
 ### Átomos (`components/atoms/`)
 
@@ -112,20 +112,19 @@ implementan historial, guardado de partidas, jugadas legales ni conexión al bac
 
 | Componente | Función | Origen |
 |---|---|---|
-| `Tablero` | Envuelve `react-chessboard`; admite posición y orientación. La versión actual es estática hasta integrar las jugadas legales del backend. **Es el `Tablero` del árbol original.** | UX, CU-06 |
+| `Tablero` | Envuelve `react-chessboard`; admite posición y orientación. Es interactivo por clic (casilla de origen y destino); los destinos legales salen de `GET /games/:id/legal-moves` y la orientación usa la opción nativa `boardOrientation`. **Es el `Tablero` del árbol original.** | UX, CU-06 |
 | `MenuPrincipal` | "¡Bienvenido!", `Titulo` y el inicio de una nueva partida. Historial y reanudar quedan pendientes. | UX: Menú, CU-05 |
 | `CintaParticipantes` | Franja inferior con los participantes pasando de izquierda a derecha | UX: Menú |
 | `PanelConfiguracion` | Modo, alias, dificultad, color y tiempo en una sola pantalla; "Comenzar" aparece cuando todo está elegido | UX: Configuración, CU-01 |
-| `ListaJugadas` | Lista de `ItemJugada` de la partida en curso o reproducida | QA PF-03 paso 10 |
+| `ListaJugadas` | Jugadas en pares ("1. e4 e5") y el botón "Guardar y salir" | QA PF-03 paso 10 |
 | `Dialogo` | Contenedor accesible para diálogos sobre la partida | UX: confirmación y resultado |
 | `DialogoRendicion` | Confirmación de abandono; permite cancelar o rendirse | UX: confirmación de abandono |
-| `DialogoVictoria` | Ganador por abandono, color, revisión de partida y regreso al menú | UX: resultado de partida |
+| `DialogoVictoria` | Resultado real (jaque mate, abandono, tablas…), ID de partida, revisión y regreso al menú | UX: resultado de partida |
+| `DialogoPromocion` | Elegir pieza de coronación (Dama, Torre, Alfil, Caballo). **Implementa `ModalPromocion`.** | CU-06 paso 3 |
+| `DialogoAviso` | Aviso con acciones: error del motor ("Reintentar" / "Guardar y salir"), errores de la API, partida guardada. **Implementa `ModalErrorMotor`.** | CU-03 flujo 3a |
 | `VisorPGN` | `ListaJugadas` + `ControlesReproduccion` | CU-05 paso 4 |
 | `FiltrosHistorial` | `CampoFiltro` por ELO/dificultad, modo y estado/resultado | CU-05 paso 3 |
 | `ListaPartidas` | `FilaPartida` + estados vacíos | CU-05 |
-| `ModalPromocion` | Elegir pieza de coronación | CU-06 paso 3 |
-| `ModalResultado` | Resultado final y motivo (mate, tablas, abandono) | CU-02/03/04, RN-03 |
-| `ModalErrorMotor` | Falla del motor con "Reintentar" y "Pausar" | CU-03 flujo 3a |
 
 ### Plantillas (`components/templates/`) y páginas (`pages/`)
 

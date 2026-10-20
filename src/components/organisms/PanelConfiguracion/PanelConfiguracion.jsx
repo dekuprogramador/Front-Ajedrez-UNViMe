@@ -2,7 +2,7 @@ import Boton from '../../atoms/Boton/index.js';
 import GrupoOpciones from '../../molecules/GrupoOpciones/index.js';
 import Texto from '../../atoms/Texto/index.js';
 
-const opciones = [
+const grupos = [
   {
     clave: 'modo',
     titulo: 'Modo de partida',
@@ -10,15 +10,6 @@ const opciones = [
       { valor: 'jugador', etiqueta: 'vs Jugador' },
       { valor: 'stockfish', etiqueta: 'vs Stockfish' },
       { valor: 'unvime', etiqueta: 'vs IA UNViMe' },
-    ],
-  },
-  {
-    clave: 'dificultad',
-    titulo: 'Nivel de dificultad',
-    valores: [
-      { valor: 'facil', etiqueta: 'Fácil', clase: 'opcion--facil' },
-      { valor: 'medio', etiqueta: 'Medio', clase: 'opcion--medio' },
-      { valor: 'dificil', etiqueta: 'Difícil', clase: 'opcion--dificil' },
     ],
   },
   {
@@ -44,19 +35,28 @@ const opciones = [
 const PanelConfiguracion = ({
   configuracion,
   elementosFaltantes,
+  niveles = [],
+  errorNiveles = '',
+  ocupado = false,
   onSeleccionar,
   onVolver,
   onComenzar,
 }) => {
   const esPartidaLocal = configuracion.modo === 'jugador';
+  const [grupoModo, ...restoGrupos] = grupos;
+  const grupoDificultad = {
+    clave: 'dificultad',
+    titulo: 'Nivel de dificultad',
+    valores: niveles,
+  };
 
   return (
     <div className="panel-configuracion">
       <h1>Ajedrez UNViMe</h1>
       <div className="panel-configuracion__opciones">
-        {opciones.map(({ clave, titulo, valores }) => (
+        {[grupoModo, grupoDificultad, ...restoGrupos].map(({ clave, titulo, valores }) => (
           <GrupoOpciones
-            deshabilitado={clave === 'dificultad' && esPartidaLocal}
+            deshabilitado={clave === 'dificultad' && (esPartidaLocal || valores.length === 0)}
             key={clave}
             onSeleccionar={(valor) => onSeleccionar(clave, valor)}
             opciones={valores}
@@ -72,7 +72,7 @@ const PanelConfiguracion = ({
         </Boton>
         <Boton
           className={`boton-pequeno${elementosFaltantes.length === 0 ? ' is-ready' : ''}`}
-          disabled={elementosFaltantes.length > 0}
+          disabled={elementosFaltantes.length > 0 || ocupado}
           onClick={onComenzar}
         >
           COMENZAR ▶
@@ -80,9 +80,10 @@ const PanelConfiguracion = ({
       </div>
 
       <Texto aria-live="polite" className="panel-configuracion__aviso" as="p">
-        {elementosFaltantes.length > 0
-          ? `Falta elegir: ${elementosFaltantes.join(', ')}`
-          : ''}
+        {ocupado ? 'Creando la partida…' : errorNiveles
+          || (elementosFaltantes.length > 0
+            ? `Falta elegir: ${elementosFaltantes.join(', ')}`
+            : '')}
       </Texto>
     </div>
   );

@@ -165,24 +165,6 @@
   user-select: none;
 }
 
-.tablero #chessboard-board {
-  transition: transform 0.5s ease;
-}
-
-.tablero--girado #chessboard-board {
-  transform: rotate(180deg);
-}
-
-.tablero--girado #chessboard-board [id^="chessboard-square-"] {
-  transform: rotate(180deg);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tablero #chessboard-board {
-    transition: none;
-  }
-}
-
 .tablero-decorativo {
   width: var(--ancho-tablero);
 }
@@ -385,12 +367,21 @@
 .lista-jugadas {
   width: min(420px, 92vw);
   height: min(400px, 50vh);
-  overflow: auto;
+  overflow: hidden;
   padding: 28px;
   border-radius: var(--radio-pequeno);
   background: var(--color-panel-jugadas);
   box-shadow: 0 6px 24px var(--sombra-fuerte);
   text-align: center;
+}
+
+.lista-jugadas__interior {
+  height: 100%;
+  overflow: auto;
+  padding: 14px;
+  border: 2px solid rgb(0 0 0 / 40%);
+  border-radius: var(--radio-pequeno);
+  background: var(--color-panel-jugadas-interior);
 }
 
 .lista-jugadas h2 {
@@ -726,4 +717,39 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Lista de jugadas y acciones de la partida */
+.lista-jugadas__pares {
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--fuente-texto);
+  font-size: 22px;
+}
+
+.lista-jugadas__pares li {
+  display: grid;
+  grid-template-columns: 3ch 1fr 1fr;
+  gap: 8px;
+  text-align: left;
+}
+
+.lista-jugadas__numero {
+  color: var(--color-texto-secundario);
+}
+
+.lista-jugadas__guardar {
+  margin-top: 8px;
+}
+
+.aviso-estado {
+  min-height: 1.4em;
+  color: var(--color-texto);
+  font-size: 20px;
+  text-align: center;
+}
+
+.aviso-estado.is-error {
+  color: var(--color-medio);
 }

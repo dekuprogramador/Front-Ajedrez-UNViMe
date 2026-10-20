@@ -7,6 +7,7 @@
   --color-panel-superior: #34204a;
   --color-panel-inferior: #25163a;
   --color-panel-jugadas: #3f2a52;
+  --color-panel-jugadas-interior: #12061f;
   --color-panel-dialogo: #10051d;
   --color-borde-dialogo: #271538;
   --color-confeti-uno: #ffb703;
@@ -26,6 +27,8 @@
   --color-piezas-negras: #0c0c10;
   --color-borde-negro: #555;
   --color-reloj-vacio: #ff2a2a;
+  --color-casilla-seleccionada: rgb(231 122 247 / 60%);
+  --color-destino-jugada: rgb(60 20 80 / 45%);
   --color-coordenada: rgb(120 80 50 / 80%);
 
   --fuente-titulo: "Jersey 20", sans-serif;
